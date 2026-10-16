@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASHFALL — Souls-like Boss Rush</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="vignette"></div>
+<div id="damage-flash"></div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="boss-bar-wrap">
+    <div id="boss-name">HOLLOW BLADE</div>
+    <div id="boss-bar-bg"><div id="boss-bar"></div><div id="boss-bar-ghost"></div></div>
+    <div id="posture-row"><span class="bar-label">POSTURE</span><div id="posture-bg"><div id="posture-bar"></div></div></div>
+    <div id="boss-counter">I / III</div>
+  </div>
+  <div id="player-plate">
+    <div class="bar-row"><span class="bar-label">HP</span><div class="bar-bg hp-bg"><div id="hp-bar"></div><div id="hp-ghost"></div></div></div>
+    <div class="bar-row"><span class="bar-label">ST</span><div class="bar-bg st-bg"><div id="st-bar"></div></div></div>
+    <div id="estus-row"></div>
+    <div id="timer-row"><span id="run-timer">00:00</span><span id="deaths">☠ 0</span></div>
+  </div>
+  <div id="controls-hint">WASD move · LMB attack · F heavy · RMB tap = PARRY / hold = block · Space roll · E flask/deathblow · Q lock-on · Shift sprint</div>
+  <div id="lock-indicator" class="hidden">◎ LOCKED</div>
+  <div id="deathblow" class="hidden">⚠ DEATHBLOW — LMB / E ⚠</div>
+  <div id="boss-intro" class="hidden"><div id="boss-intro-sub">GREAT ENEMY</div><div id="boss-intro-name">HOLLOW BLADE</div></div>
+  <div id="center-banner" class="hidden"></div>
+</div>
+
+<!-- Title -->
+<div id="title-screen">
+  <div id="title-ember"></div>
+  <h1 id="game-title">ASHFALL</h1>
+  <div id="game-sub">A SOULS-LIKE BOSS RUSH · III GREAT ENEMIES</div>
+  <div id="boss-list">
+    <div class="boss-card"><span class="numeral">I</span><b>Hollow Blade</b><i>fallen duelist</i></div>
+    <div class="boss-card"><span class="numeral">II</span><b>Cinder Golem</b><i>heart of slag</i></div>
+    <div class="boss-card"><span class="numeral">III</span><b>Ashen Saint</b><i>choir of embers</i></div>
+  </div>
+  <button id="btn-start">⚔ &nbsp;BEGIN THE RUSH&nbsp; ⚔</button>
+  <div id="controls-grid">
+    <div><kbd>W A S D</kbd> move</div><div><kbd>Mouse</kbd> camera (click = pointer lock)</div>
+    <div><kbd>LMB</kbd> light attack (3-hit combo)</div><div><kbd>F</kbd> heavy attack</div>
+    <div><kbd>RMB tap</kbd> SEKIRO PARRY (fills boss posture)</div><div><kbd>RMB hold</kbd> block</div>
+    <div><kbd>Space</kbd> dodge roll (i-frames)</div><div><kbd>R</kbd> parry · <kbd>Q</kbd> lock-on · <kbd>Shift</kbd> sprint</div>
+    <div><kbd>E</kbd> ember flask (3 charges) / deathblow</div><div><kbd>M</kbd> mute</div>
+  </div>
+  <div id="title-tip">Deflect like Sekiro: tap RMB at the last moment. Full posture = DEATHBLOW. Best time: <span id="best-time">—</span></div>
+  <div id="loading-note">forging arena…</div>
+</div>
+
+<!-- Death / rest / victory -->
+<div id="death-screen" class="overlay hidden">
+  <div class="big-red">YOU DIED</div>
+  <div class="overlay-sub" id="death-sub">the flame flickers</div>
+  <button id="btn-respawn" class="btn">RISE AGAIN</button>
+</div>
+<div id="felled-screen" class="overlay hidden">
+  <div class="big-gold">GREAT ENEMY FELLED</div>
+  <div class="overlay-sub" id="felled-sub"></div>
+  <button id="btn-next" class="btn">APPROACH THE FOG →</button>
+</div>
+<div id="victory-screen" class="overlay hidden">
+  <div class="big-gold">LORD OF CINDER</div>
+  <div class="overlay-sub" id="victory-sub"></div>
+  <div id="victory-stats"></div>
+  <button id="btn-again" class="btn">BEGIN ANEW (NG+ HARDER)</button>
+</div>
+<div id="pause-tip" class="hidden">Click to recapture mouse · WASD to move</div>
+<div id="dmg-layer"></div>
+<div id="toast" class="hidden"></div>
+
+<script type="module" src="game.js"></script>
+<script>
+// Boot watchdog: if the 3D module failed (CDN blocked, no WebGL, sandbox error),
+// replace the dead button with an explanation + retry instead of silence.
+setTimeout(function(){
+  if(window.__ashfall||window.__ashfallFailed)return;
+  var note=document.getElementById('loading-note');
+  if(note){ note.textContent='3D engine failed to load (CDN/WebGL blocked) — click BEGIN to retry'; note.style.opacity=1; }
+  var btn=document.getElementById('btn-start');
+  if(btn&&!btn.dataset.armed){ btn.dataset.armed='1'; btn.addEventListener('click',function(){ location.reload(); }); }
+},9000);
+</script>
+</body>
+</html>
